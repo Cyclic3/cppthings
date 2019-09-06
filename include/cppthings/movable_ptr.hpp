@@ -1,3 +1,4 @@
+namespace cppthings {
   template<typename T>
   class movable_ptr {
   private:
@@ -44,3 +45,4 @@
     constexpr bool operator>=(const movable_ptr& other) { return ptr >= other.ptr; }
     constexpr bool operator>=(const T* other)           { return ptr >= other; }
   };
+}
