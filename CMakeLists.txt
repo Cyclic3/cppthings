@@ -1,10 +1,31 @@
 cmake_minimum_required(VERSION 3.10)
 
+find_program(CCACHE_FOUND ccache)
+if(CCACHE_FOUND AND NOT DISABLE_CCACHE)
+  message("Using ccache")
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+else()
+  message("Not using ccache")
+endif()
+
 project(cppthings VERSION 0.0.1)
 set(PROJECT_NAMESPACE CppThings)
 
-add_library(cppthings INTERFACE)
-target_compile_features(cppthings INTERFACE cxx_std_17)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+add_library(${PROJECT_NAME} INTERFACE)
+
+# Begin requirements
+# End requirements
+
+
+target_link_libraries(${PROJECT_NAME}
+PUBLIC # Libraries needed to use this library
+PRIVATE # Libraries only needed to build this library
+)
+
+target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
 
 include(GNUInstallDirs)
 
@@ -12,6 +33,11 @@ target_include_directories(${PROJECT_NAME} INTERFACE
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
+
+install(EXPORT ${PROJECT_NAME}_targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        NAMESPACE ${PROJECT_NAMESPACE}::
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAMESPACE}/cmake)
 
 install(TARGETS ${PROJECT_NAME}
   EXPORT ${PROJECT_NAME}_targets
@@ -33,16 +59,13 @@ configure_package_config_file(
   "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAMESPACE}/cmake"
 )
 
-install(EXPORT ${PROJECT_NAME}_Targets
-        FILE ${PROJECT_NAME}Targets.cmake
-        NAMESPACE ${PROJECT_NAMESPACE}::
-        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAMESPACE}/cmake)
-
 install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
               "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
         DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAMESOACE}/cmake)
 
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include DESTINATION include)
 
-add_library(CppThings::cppthings ALIAS cppthings)
+add_library(${PROJECT_NAMESPACE}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
+
+cmake_minimum_required(VERSION 3.10)

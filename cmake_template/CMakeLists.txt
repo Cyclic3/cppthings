@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 
 find_program(CCACHE_FOUND ccache)
-if(CCACHE_FOUND)
+if(CCACHE_FOUND AND NOT DISABLE_CCACHE)
   message("Using ccache")
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ccache)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
+else()
+  message("Not using ccache")
 endif()
 
 project(@@ VERSION @@)
@@ -35,6 +37,11 @@ target_include_directories(${PROJECT_NAME} INTERFACE
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
+install(EXPORT ${PROJECT_NAME}_targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        NAMESPACE ${PROJECT_NAMESPACE}::
+        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAMESPACE}/cmake)
+
 install(TARGETS ${PROJECT_NAME}
   EXPORT ${PROJECT_NAME}_targets
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -54,11 +61,6 @@ configure_package_config_file(
   INSTALL_DESTINATION
   "${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAMESPACE}/cmake"
 )
-
-install(EXPORT ${PROJECT_NAME}_Targets
-        FILE ${PROJECT_NAME}Targets.cmake
-        NAMESPACE ${PROJECT_NAMESPACE}::
-        DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAMESPACE}/cmake)
 
 install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
               "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
