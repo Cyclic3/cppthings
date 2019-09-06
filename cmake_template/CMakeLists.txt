@@ -14,7 +14,8 @@ set(PROJECT_NAMESPACE @@)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-add_library(${PROJECT_NAME})
+file(GLOB_RECURSE ${PROJECT_NAME}_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+add_library(${PROJECT_NAME} ${${PROJECT_NAME}_SOURCES})
 
 # Begin requirements
 # @@
@@ -32,7 +33,7 @@ target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 include(GNUInstallDirs)
 
-target_include_directories(${PROJECT_NAME} INTERFACE
+target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
