@@ -50,8 +50,8 @@ namespace cppthings {
     constexpr bool operator>=(const T* other)           { return ptr >= other; }
 
     template<typename Int, typename = std::enable_if<std::is_integral_v<Int>>>
-    constexpr T* operator+ (Int i) { return ptr + i; }
+    constexpr T* operator+ (Int i) const { return ptr + i; }
     template<typename Int, typename = std::enable_if<std::is_integral_v<Int>>>
-    constexpr T* operator-(Int i) { return ptr - i; }
+    constexpr T* operator- (Int i) const { return ptr - i; }
   };
 }
