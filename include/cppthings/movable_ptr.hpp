@@ -1,3 +1,7 @@
+#pragma once
+
+#include <utility>
+
 namespace cppthings {
   template<typename T>
   class movable_ptr {
@@ -44,5 +48,10 @@ namespace cppthings {
     constexpr bool operator<=(const T* other)           { return ptr <= other; }
     constexpr bool operator>=(const movable_ptr& other) { return ptr >= other.ptr; }
     constexpr bool operator>=(const T* other)           { return ptr >= other; }
+
+    template<typename Int, typename = std::enable_if<std::is_integral_v<Int>>>
+    constexpr T* operator+ (Int i) { return ptr + i; }
+    template<typename Int, typename = std::enable_if<std::is_integral_v<Int>>>
+    constexpr T* operator-(Int i) { return ptr - i; }
   };
 }
