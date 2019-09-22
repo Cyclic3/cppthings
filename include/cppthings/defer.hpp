@@ -6,9 +6,35 @@
 #include <functional>
 
 namespace cppthings {
-  // I could write this myself, but I would mess it up. So let's hijack a completely different construct ;)
-  inline std::unique_ptr<void, std::function<void(void)>> defer(std::function<void(void)> f) {
-    return {nullptr, f};
+  class deferred_call {
+  private:
+    std::function<void(void)> f;
+
+  public:
+    inline deferred_call(decltype(f)&& f_) : f{std::move(f_)} {}
+
+    inline ~deferred_call() {
+      if (f)
+        f();
+    }
+
+  public:
+    inline deferred_call& operator=(const deferred_call&) = delete;
+    inline deferred_call(const deferred_call&) = delete;
+
+    inline deferred_call& operator=(deferred_call&& other) {
+      f = std::move(other.f);
+      other.f = {};
+      return *this;
+    }
+    inline deferred_call(deferred_call&& other) : f{std::move(other.f)} {
+      other.f = {};
+    }
+  };
+
+  /// Returns an object, which when destroyed, calls a function
+  template<typename... Args>
+  inline deferred_call defer(Args&&... args) {
+    return {args...};
   }
 }
-
