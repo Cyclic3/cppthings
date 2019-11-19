@@ -11,6 +11,7 @@ namespace cppthings {
     std::function<void(void)> f;
 
   public:
+    inline deferred_call() {}
     inline deferred_call(decltype(f)&& f_) : f{std::move(f_)} {}
 
     inline ~deferred_call() {
