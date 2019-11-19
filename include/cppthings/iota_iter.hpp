@@ -39,11 +39,9 @@ namespace cppthings {
     iota_iter& operator=(const iota_iter&) = default;
     iota_iter& operator=(iota_iter&&) = default;
 
-//    template<typename... Args>
-//    inline constexpr iota_iter(Args&&... args) : base{std::forward<Args&&>(args)...} {}
+    inline constexpr iota_iter(T&& base) : base{std::forward<T&&>(base)} {}
   };
 
-  template<typename T> iota_iter(iota_iter<T>) -> iota_iter<T>;
   template<typename T> iota_iter(iota_iter<T>) -> iota_iter<T>;
   template<typename T> iota_iter(T) -> iota_iter<T>;
 }
