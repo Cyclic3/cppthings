@@ -9,17 +9,17 @@ namespace cppthings {
     T* ptr;
 
   public:
-    constexpr T* get() { return ptr; }
-    constexpr const T* get() const { return ptr; }
+    constexpr T*& get() { return ptr; }
+    constexpr const T* const& get() const { return ptr; }
 
     constexpr T* reset(T* p = nullptr) { T* ret = ptr; ptr = p; return ret; }
 
-    constexpr operator T*() { return ptr; }
-    constexpr operator const T*() const { return ptr; }
+    constexpr operator T*&() { return ptr; }
+    constexpr operator T* const&() const { return ptr; }
     constexpr T& operator*() { return *ptr; }
     constexpr const T& operator*() const { return *ptr; }
-    constexpr T* operator->() { return ptr; }
-    constexpr const T* operator->() const { return ptr; }
+    constexpr T*& operator->() { return ptr; }
+    constexpr const T* const& operator->() const { return ptr; }
     constexpr operator bool() const { return ptr != nullptr; }
 
   public:
