@@ -138,12 +138,9 @@ namespace cppthings {
       //
       // We also won't check for is_end, because UB. Get rekt.
       for (auto& i : base) {
-        if (i == nl::max())
-          i = nl::min(); // We might as well do this explicitly, as we are branching anyway
-        else {
-          ++i;
+        ++i;
+        if (i != nl::min())
           return *this;
-        }
       }
       is_end = true;
       return *this;
@@ -214,12 +211,26 @@ namespace cppthings {
       //
       // We also won't check for is_end, because UB. Get rekt.
       for (auto iter = base.rbegin(); iter != base.rend(); ++iter) {
-        if (*iter == nl::max())
-          *iter = nl::min(); // We might as well do this explicitly, as we are branching anyway
-        else {
-          ++*iter;
+        ++*iter;
+        if (*iter != nl::min())
           return *this;
-        }
+      }
+      is_end = true;
+      return *this;
+    }
+    constexpr iota_iter_arr_be& operator+=(Elem i) {
+      // A check for is_max would require a pass anyway, so don't use it
+      //
+      // We also won't check for is_end, because UB. Get rekt.
+      auto iter = base.rbegin();
+      auto init = *iter;
+      *iter += i;
+      if (*iter > init)
+        return *this;
+      for (++iter; iter != base.rend(); ++iter) {
+        ++*iter;
+        if (*iter != nl::min())
+          return *this;
       }
       is_end = true;
       return *this;
