@@ -66,3 +66,19 @@ install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/include DESTINATION include)
 
 add_library(${PROJECT_NAMESPACE}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
+option(CPPTHINGS_TEST "Enable testing of cppthings")
+
+if (${CPPTHINGS_TEST})
+  message("Tests enabled")
+  enable_testing()
+  find_package(GTest REQUIRED)
+  include(GoogleTest)
+
+  file(GLOB_RECURSE test_source test/*.cpp)
+  add_executable(${PROJECT_NAME}-test ${test_source})
+  target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} GTest::GTest GTest::Main)
+  gtest_discover_tests(${PROJECT_NAME}-test)
+else()
+  message("Tests disabled")
+endif()
