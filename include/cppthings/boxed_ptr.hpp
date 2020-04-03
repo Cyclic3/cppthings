@@ -44,8 +44,8 @@ namespace cppthings {
     inline boxed_ptr    (const boxed_ptr<U, E>& other) { box = decltype(box){new T(*other.box)}; }
     inline boxed_ptr    (const boxed_ptr      & other) { box = decltype(box){new T(*other.box)}; }
     template<typename U, typename E>
-    boxed_ptr& operator=(const boxed_ptr<U, E>& other) { box = decltype(box){new T(*other.box)}; }
-    boxed_ptr& operator=(const boxed_ptr      & other) { box = decltype(box){new T(*other.box)}; }
+    boxed_ptr& operator=(const boxed_ptr<U, E>& other) { box = decltype(box){new T(*other.box)}; return *this; }
+    boxed_ptr& operator=(const boxed_ptr      & other) { box = decltype(box){new T(*other.box)}; return *this; }
 
     boxed_ptr           (boxed_ptr&& other) = default;
     boxed_ptr& operator=(boxed_ptr&& other) = default;

@@ -78,6 +78,11 @@ if (${CPPTHINGS_TEST})
   file(GLOB_RECURSE test_source test/*.cpp)
   add_executable(${PROJECT_NAME}-test ${test_source})
   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME} GTest::GTest GTest::Main)
+
+  if ((CMAKE_CXX_COMPILER_ID STREQUAL "Clang") OR (CMAKE_CXX_COMPILER_ID STREQUAL "GNU"))
+    target_compile_options(${PROJECT_NAME}-test PRIVATE "-Wall" "-Wextra" "-Werror" "-Weffc++")
+  endif()
+
   gtest_discover_tests(${PROJECT_NAME}-test)
 else()
   message("Tests disabled")

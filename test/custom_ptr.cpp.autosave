@@ -11,5 +11,3 @@ TEST (cppthings, CustomPtrContrived) {
   }
   EXPECT_EQ(result, 33);
 }
-
-int foo() {}
