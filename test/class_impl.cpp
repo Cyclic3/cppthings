@@ -5,8 +5,17 @@
 struct int_wrapper {
   int value;
 
-  CPPTHINGS_IMPL_SHALLOW_EQ_NOEXCEPT(int_wrapper, &int_wrapper::value);
+  CPPTHINGS_IMPL_SHALLOW_EQ_NOEXCEPT(int_wrapper, value);
 };
+
+#define __CPPTHINGS_MEMBER_PTR_1(TYPE, X) &TYPE::X
+
+#define CPPTHINGS_TEST_MACRO(X) int X;
+#define CPPTHINGS_TEST(...) \
+  CPPTHINGS_FOR_EACH(CPPTHINGS_TEST_MACRO, __VA_ARGS__)
+
+#define FOO(TYPE, ...) \
+  void test(CPPTHINGS_FOR_EACH_1(__CPPTHINGS_MEMBER_PTR_1, TYPE, __VA__ARGS__))
 
 TEST (cppthings, ClassImplEq) {
   int_wrapper a{2}, b{2}, c{3};
