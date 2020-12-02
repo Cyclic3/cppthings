@@ -12,6 +12,9 @@ namespace cppthings {
     F* f;
 
   public:
+    void cancel() { f = nullptr; }
+
+  public:
     inline deferred_call() : f{nullptr} {}
     inline deferred_call(F* f_) : f{std::move(f_)} {}
 

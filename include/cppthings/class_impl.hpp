@@ -5,6 +5,8 @@
 #include <cppthings/macros.hpp>
 #endif
 
+#include <utility>
+
 namespace cppthings {
   template<typename T>
   constexpr bool check_shallow_equal(const T&, const T&) {
@@ -44,3 +46,19 @@ namespace cppthings {
     return !::cppthings::check_shallow_equal(*this, other, CPPTHINGS_FOR_EACH_ARG(__CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__)); \
   }
 #endif
+
+#define CPPTHINGS_BEGIN_WRAPPER_STRUCT(NAME, VAL_TYPE, VAL_NAME)                              \
+  struct NAME {                                                                               \
+    VAL_TYPE VAL_NAME;                                                                        \
+    inline operator       VAL_TYPE& ()      &  { return VAL_NAME; }                           \
+    inline operator const VAL_TYPE& () const&  { return VAL_NAME; }                           \
+    inline operator       VAL_TYPE&&()      && { return std::move(VAL_NAME); }                \
+    NAME() = default;                                                                         \
+    NAME(const NAME& ) = default;                                                             \
+    NAME(      NAME&&) = default;                                                             \
+    NAME& operator=(const NAME& ) = default;                                                  \
+    NAME& operator=(      NAME&&) = default;                                                  \
+    template<typename... Args>                                                                \
+    inline NAME(Args&&... args) : VAL_NAME(std::forward<Args>(args)...) {}
+
+CPPTHINGS_BEGIN_WRAPPER_STRUCT(wrapper, int, value) };
