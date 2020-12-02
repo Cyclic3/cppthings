@@ -37,6 +37,38 @@ namespace cppthings {
     }
   };
 
+  /// Represents a sequence of actions that can be rolled back in reverse order. By default, this happens on deconstruction
+  class transaction {
+    std::vector<std::function<void(void)>> states;
+    bool auto_rollback;
+
+  public:
+    inline void add(decltype(states)::value_type&& val) {
+      states.emplace_back(std::move(val));
+    }
+
+    inline void commit() {
+      states.clear();
+    }
+
+    inline void rollback() {
+      for (auto iter = states.rbegin(); iter != states.rend(); ++iter)
+        (*iter)();
+      states.clear();
+    }
+
+    inline bool get_auto_rollback() const { return auto_rollback; }
+    inline void set_auto_rollback(bool b) { auto_rollback = b; }
+
+  public:
+    inline transaction(bool auto_rollback_ = true) : auto_rollback{auto_rollback_} {}
+
+    inline ~transaction() {
+      if (auto_rollback)
+        rollback();
+    }
+  };
+
   /// Returns an object, which when destroyed, calls a function
   template<typename Func>
   inline deferred_call<std::decay_t<Func>> defer(Func&& f) {
