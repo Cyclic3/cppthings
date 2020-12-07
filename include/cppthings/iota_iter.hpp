@@ -175,22 +175,25 @@ namespace cppthings {
     iota_iter_arr_le() : is_end{true} {}
   };
 
-  /// iota iter for unsigned, big endian arrays. Go wild.
-  template<typename Elem, size_t Count>
-  class iota_iter_arr_be {
+  /// iota iter for unsigned, big endian collections. Go wild.
+  template<typename Collection>
+  class iota_iter_be {
   public:
-    using T = std::array<Elem, Count>;
+    using T = Collection;
     using difference_type = T;
     using value_type = T;
     using pointer = const T*;
     using reference = const T&;
     using iterator_category = std::bidirectional_iterator_tag;
-  private:
-    using nl = std::numeric_limits<Elem>;
 
   public:
     T base;
     bool is_end;
+
+  public:
+    using Elem = std::iterator_traits<decltype(begin(base))>;
+  private:
+    using nl = std::numeric_limits<Elem>;
 
   public:
     constexpr bool is_max() const {
@@ -205,8 +208,8 @@ namespace cppthings {
 
   public:
     constexpr const T& operator*() const { return base; }
-    constexpr iota_iter_arr_be operator++(int) { auto cpy = *this; ++*this; return cpy; }
-    constexpr iota_iter_arr_be& operator++() {
+    constexpr iota_iter_be operator++(int) { auto cpy = *this; ++*this; return cpy; }
+    constexpr iota_iter_be& operator++() {
       // A check for is_max would require a pass anyway, so don't use it
       //
       // We also won't check for is_end, because UB. Get rekt.
@@ -218,7 +221,7 @@ namespace cppthings {
       is_end = true;
       return *this;
     }
-    constexpr iota_iter_arr_be& operator+=(Elem i) {
+    constexpr iota_iter_be& operator+=(Elem i) {
       // A check for is_max would require a pass anyway, so don't use it
       //
       // We also won't check for is_end, because UB. Get rekt.
@@ -235,8 +238,8 @@ namespace cppthings {
       is_end = true;
       return *this;
     }
-    constexpr iota_iter_arr_be operator--(int) { auto cpy = *this; --*this; return cpy;  }
-    constexpr iota_iter_arr_be& operator--() {
+    constexpr iota_iter_be operator--(int) { auto cpy = *this; --*this; return cpy;  }
+    constexpr iota_iter_be& operator--() {
       for (auto iter = base.rbegin(); iter != base.rend(); ++iter) {
         if (*iter == nl::min())
           *iter = nl::max(); // We might as well do this explicitly, as we are branching anyway
@@ -249,19 +252,22 @@ namespace cppthings {
       throw std::logic_error("Tried to go before the start of an iota_iter_arr_le");
     }
 
-    constexpr bool operator==(const iota_iter_arr_be& other) { return base == other.base; }
-    constexpr bool operator!=(const iota_iter_arr_be& other) { return base != other.base; }
+    constexpr bool operator==(const iota_iter_be& other) { return base == other.base; }
+    constexpr bool operator!=(const iota_iter_be& other) { return base != other.base; }
 
   public:
-    iota_iter_arr_be(const iota_iter_arr_be&) = default;
-    iota_iter_arr_be(iota_iter_arr_be&&) = default;
+    iota_iter_be(const iota_iter_be&) = default;
+    iota_iter_be(iota_iter_be&&) = default;
 
-    iota_iter_arr_be& operator=(const iota_iter_arr_be&) = default;
-    iota_iter_arr_be& operator=(iota_iter_arr_be&&) = default;
+    iota_iter_be& operator=(const iota_iter_be&) = default;
+    iota_iter_be& operator=(iota_iter_be&&) = default;
 
-    iota_iter_arr_be(T&& base) : base{std::forward<T&&>(base)}, is_end{false} {}
+    iota_iter_be(T&& base) : base{std::forward<T&&>(base)}, is_end{false} {}
     template<typename... Args>
-    iota_iter_arr_be(std::in_place_t, Args... args) : base{static_cast<Elem>(args)...}, is_end{false} {}
-    iota_iter_arr_be() : is_end{true} {}
+    iota_iter_be(std::in_place_t, Args... args) : base{static_cast<Elem>(args)...}, is_end{false} {}
+    iota_iter_be() : is_end{true} {}
   };
+
+  template<typename Elem, size_t Count>
+  using iota_iter_arr_be = iota_iter_be<std::array<Elem, Count>>;
 }
