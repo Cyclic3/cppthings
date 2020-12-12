@@ -15,8 +15,33 @@ namespace cppthings {
 #define CPPTHINGS_EXPOSE_REGISTRY(NAME, KEY_T, VALUE_T) \
   namespace NAME { \
     using key_t = KEY_T; using value_t = VALUE_T; \
-    void do_register(key_t key, value_t value); \
-    std::optional<value_t> do_lookup(key_t key); \
+    static std::map<key_t, value_t, std::less<>>& get_registry(); \
+    inline void do_register(key_t key, value_t value) { get_registry().emplace(std::move(key), std::move(value)); } \
+    template<typename T> \
+    inline std::optional<value_t> do_lookup(T&& key) { \
+      auto& reg = get_registry(); \
+      auto iter = reg.find(key); \
+      return (iter == reg.end()) ? std::nullopt : std::optional<value_t>{iter->second}; \
+    } \
+  }
+
+#define CPPTHINGS_EXPOSE_CONCURRENT_REGISTRY(NAME, KEY_T, VALUE_T) \
+  namespace NAME { \
+    using key_t = KEY_T; using value_t = VALUE_T; \
+    static std::map<key_t, value_t, std::less<>>& get_registry(); \
+    static std::map<key_t, value_t>& get_registry(); \
+    static std::shared_mutex& get_mutex(); \
+    inline void do_register(key_t key, value_t value) { \
+      std::shared_lock lock{get_mutex()}; \
+      get_registry().emplace(std::move(key), std::move(value)); \
+    } \
+    template<typename T> \
+    inline std::optional<value_t> do_lookup(T&& key) { \
+      std::unique_lock lock{get_mutex()}; \
+      auto& reg = get_registry(); \
+      auto iter = reg.find(key); \
+      return (iter == reg.end()) ? std::nullopt : std::optional<value_t>{iter->second}; \
+    } \
   }
 
 #define CPPTHINGS_REGISTER(NAME, KEY, VALUE) \
@@ -26,37 +51,21 @@ namespace cppthings {
 
 #define CPPTHINGS_IMPL_REGISTRY(NAME) \
   namespace NAME { \
-    static std::map<key_t, value_t>& get_registry() { \
-      static std::map<key_t, value_t> map; \
+    std::map<key_t, value_t, std::less<>>& get_registry() { \
+      static std::map<key_t, value_t, std::less<>> map; \
       return map; \
-    } \
-    void do_register(key_t key, value_t value) { get_registry().emplace(std::move(key), std::move(value)); } \
-    std::optional<value_t> do_lookup(key_t key) { \
-      auto& reg = get_registry(); \
-      auto iter = reg.find(key); \
-      return (iter == reg.end()) ? std::nullopt : std::optional<value_t>{iter->second}; \
     } \
   }
 
 #define CPPTHINGS_IMPL_REGISTRY_CONCURRENT(NAME) \
   namespace NAME { \
-    static std::map<key_t, value_t>& get_registry() { \
-      static std::map<key_t, value_t> map; \
+    std::map<key_t, value_t, std::less<>>& get_registry() { \
+      static std::map<key_t, value_t, std::less<>> map; \
       return map; \
     } \
-    static std::shared_mutex& get_mutex() { \
+    std::shared_mutex& get_mutex() { \
       static std::shared_mutex mutex; \
       return mutex; \
-    } \
-    void do_register(key_t key, value_t value) { \
-      std::shared_lock lock{get_mutex()}; \
-      get_registry().emplace(std::move(key), std::move(value)); \
-    } \
-    std::optional<value_t> do_lookup(key_t key) { \
-      std::unique_lock lock{get_mutex()}; \
-      auto& reg = get_registry(); \
-      auto iter = reg.find(key); \
-      return (iter == reg.end()) ? std::nullopt : std::optional<value_t>{iter->second}; \
     } \
   }
 }
