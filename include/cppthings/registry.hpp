@@ -15,7 +15,7 @@ namespace cppthings {
 #define CPPTHINGS_EXPOSE_REGISTRY(NAME, KEY_T, VALUE_T) \
   namespace NAME { \
     using key_t = KEY_T; using value_t = VALUE_T; \
-    static std::map<key_t, value_t, std::less<>>& get_registry(); \
+    std::map<key_t, value_t, std::less<>>& get_registry(); \
     inline void do_register(key_t key, value_t value) { get_registry().emplace(std::move(key), std::move(value)); } \
     template<typename T> \
     inline std::optional<value_t> do_lookup(T&& key) { \
@@ -28,9 +28,8 @@ namespace cppthings {
 #define CPPTHINGS_EXPOSE_CONCURRENT_REGISTRY(NAME, KEY_T, VALUE_T) \
   namespace NAME { \
     using key_t = KEY_T; using value_t = VALUE_T; \
-    static std::map<key_t, value_t, std::less<>>& get_registry(); \
-    static std::map<key_t, value_t>& get_registry(); \
-    static std::shared_mutex& get_mutex(); \
+    std::map<key_t, value_t, std::less<>>& get_registry(); \
+    std::shared_mutex& get_mutex(); \
     inline void do_register(key_t key, value_t value) { \
       std::shared_lock lock{get_mutex()}; \
       get_registry().emplace(std::move(key), std::move(value)); \

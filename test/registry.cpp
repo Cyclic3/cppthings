@@ -7,7 +7,7 @@
 CPPTHINGS_EXPOSE_REGISTRY(reg, int, int);
 CPPTHINGS_IMPL_REGISTRY(reg);
 
-CPPTHINGS_EXPOSE_REGISTRY(reg_concurrent, int, int);
+CPPTHINGS_EXPOSE_CONCURRENT_REGISTRY(reg_concurrent, int, int);
 CPPTHINGS_IMPL_REGISTRY_CONCURRENT(reg_concurrent);
 
 CPPTHINGS_EXPOSE_REGISTRY(reg_str, std::string, int);
