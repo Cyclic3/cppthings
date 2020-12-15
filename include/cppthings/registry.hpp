@@ -46,7 +46,7 @@ namespace cppthings {
 #define CPPTHINGS_REGISTER(NAME, KEY, VALUE) \
   static std::monostate CPPTHINGS_CONCAT(_cppthings_reged_, __COUNTER__) = (NAME::do_register(KEY, VALUE), std::monostate{});
 
-#define CPPTHINGS_LOOKUP(NAME, KEY) NAME::do_lookup(KEY);
+#define CPPTHINGS_LOOKUP(NAME, KEY) NAME::do_lookup(KEY)
 
 #define CPPTHINGS_IMPL_REGISTRY(NAME) \
   namespace NAME { \
