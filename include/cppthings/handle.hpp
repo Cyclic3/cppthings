@@ -24,7 +24,7 @@ namespace cppthings {
     typename base_t<enable_unalloced>::type base;
 
   public:
-    inline T const& operator* () const {
+    inline T& operator* () {
       return std::visit([](auto&& x){
         if constexpr (std::is_same_v<std::remove_reference_t<decltype(x)>, T>) // constexpr ignored if not enabled_unalloced
           return x;
@@ -32,7 +32,7 @@ namespace cppthings {
           return *x;
       }, base);
     }
-    inline T const* operator->() const {
+    inline T* operator->() {
       return std::visit([](auto&& x){
         using U = std::remove_reference_t<decltype(x)>;
         if constexpr (std::is_same_v<U, T*>)
@@ -41,6 +41,14 @@ namespace cppthings {
           return x.get();
         else // constexpr ignored if not enabled_unalloced
           return &x;
+      }, base);
+    }
+    inline operator bool() const {
+      return std::visit([](auto&& x){
+        if constexpr (std::is_same_v<std::remove_cv_t<std::remove_reference_t<decltype(x)>>, T>) // constexpr ignored if not enabled_unalloced
+          return true;
+        else
+          return static_cast<bool>(x);
       }, base);
     }
 

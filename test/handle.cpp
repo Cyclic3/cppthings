@@ -13,4 +13,6 @@ TEST(cppthings, Handle) {
   handle = &base;
   handle = std::make_shared<foo>(base);
   handle = cppthings::make_boxed<foo>(base);
+
+  EXPECT_TRUE(handle);
 }
