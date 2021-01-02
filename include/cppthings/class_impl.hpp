@@ -23,12 +23,12 @@ namespace cppthings {
 
 #if defined(__cplusplus) && __cplusplus > 201703L
 #define CPPTHINGS_IMPL_SHALLOW_EQ(TYPE, ...) \
-  inline bool operator==(const TYPE& other) const { return ::cppthings::check_shallow_equal(*this, other __VA_OPT__(,) __VA_ARGS__);  } \
-  inline bool operator!=(const TYPE& other) const { return !::cppthings::check_shallow_equal(*this, other __VA_OPT__(,) __VA_ARGS__);  }
+  inline bool operator==(const TYPE& other) const { return ::cppthings::check_shallow_equal(*this, other __VA_OPT__(,) CPPTHINGS_FOR_EACH_ARG(__CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__));  } \
+  inline bool operator!=(const TYPE& other) const { return !::cppthings::check_shallow_equal(*this, other __VA_OPT__(,) CPPTHINGS_FOR_EACH_ARG(__CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__));  }
 
 #define CPPTHINGS_IMPL_SHALLOW_EQ_NOEXCEPT(TYPE, ...) \
-  inline bool operator==(const TYPE& other) const noexcept { return ::cppthings::check_shallow_equal(*this, other __VA_OPT__(,) __VA_ARGS__);  } \
-  inline bool operator!=(const TYPE& other) const noexcept { return !::cppthings::check_shallow_equal(*this, other __VA_OPT__(,) __VA_ARGS__);  }
+  inline bool operator==(const TYPE& other) const noexcept { return ::cppthings::check_shallow_equal(*this, other __VA_OPT__(,) CPPTHINGS_FOR_EACH_ARG(__CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__));  } \
+  inline bool operator!=(const TYPE& other) const noexcept { return !::cppthings::check_shallow_equal(*this, other __VA_OPT__(,) CPPTHINGS_FOR_EACH_ARG(__CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__));  }
 #else
 #define CPPTHINGS_IMPL_SHALLOW_EQ(TYPE, ...) \
   inline bool operator==(const TYPE& other) const { \
