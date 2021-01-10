@@ -3,6 +3,11 @@
 //!
 //! Copy and paste these into the source if you need them
 
+// SOURCE: https://stackoverflow.com/a/58168986
+#if defined(__cplusplus) && __cplusplus > 201703L
+#define CPPTHINGS_VA_OPT
+#endif
+
 // SO requires a copyright notice (and the user deserves one), so make sure to copy something to that effect into
 // any cloned source file
 
@@ -25,12 +30,21 @@
 #define _CPPTHINGS_FE_F(ACTION, X, ...)  ACTION(X)_CPPTHINGS_FE_E(ACTION, __VA_ARGS__)
 
 #define _CPPTHINGS_GET_MACRO(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _A, _B, _C, _D, _E, _F, NAME, ...) NAME
+#ifdef CPPTHINGS_VA_OPT
+#define CPPTHINGS_FOR_EACH(action, ...) \
+  _CPPTHINGS_GET_MACRO(_0, __VA_ARGS__, \
+            _CPPTHINGS_FE_F,_CPPTHINGS_FE_E,_CPPTHINGS_FE_D,_CPPTHINGS_FE_C, \
+            _CPPTHINGS_FE_B,_CPPTHINGS_FE_A,_CPPTHINGS_FE_9,_CPPTHINGS_FE_8, \
+            _CPPTHINGS_FE_7,_CPPTHINGS_FE_6,_CPPTHINGS_FE_5,_CPPTHINGS_FE_4, \
+            _CPPTHINGS_FE_3,_CPPTHINGS_FE_2,_CPPTHINGS_FE_1,_CPPTHINGS_FE_0)(action __VA_OPT__(,) __VA_ARGS__)
+#else
 #define CPPTHINGS_FOR_EACH(action, ...) \
   _CPPTHINGS_GET_MACRO(_0, __VA_ARGS__, \
             _CPPTHINGS_FE_F,_CPPTHINGS_FE_E,_CPPTHINGS_FE_D,_CPPTHINGS_FE_C, \
             _CPPTHINGS_FE_B,_CPPTHINGS_FE_A,_CPPTHINGS_FE_9,_CPPTHINGS_FE_8, \
             _CPPTHINGS_FE_7,_CPPTHINGS_FE_6,_CPPTHINGS_FE_5,_CPPTHINGS_FE_4, \
             _CPPTHINGS_FE_3,_CPPTHINGS_FE_2,_CPPTHINGS_FE_1,_CPPTHINGS_FE_0)(action,__VA_ARGS__)
+#endif
 
 #define _CPPTHINGS_FE_ARG_0(ACTION, ARG)
 #define _CPPTHINGS_FE_ARG_1(ACTION, ARG, X)       ACTION(ARG, X)
@@ -49,12 +63,21 @@
 #define _CPPTHINGS_FE_ARG_E(ACTION, ARG, X, ...)  ACTION(ARG, X)_CPPTHINGS_FE_ARG_D(ACTION, ARG, __VA_ARGS__)
 #define _CPPTHINGS_FE_ARG_F(ACTION, ARG, X, ...)  ACTION(ARG, X)_CPPTHINGS_FE_ARG_E(ACTION, ARG, __VA_ARGS__)
 
+#ifdef CPPTHINGS_VA_OPT
+#define CPPTHINGS_FOR_EACH_ARG(action, ARG, ...) \
+  _CPPTHINGS_GET_MACRO(_0, __VA_ARGS__, \
+            _CPPTHINGS_FE_ARG_F,_CPPTHINGS_FE_ARG_E,_CPPTHINGS_FE_ARG_D,_CPPTHINGS_ARG_FE_C, \
+            _CPPTHINGS_FE_ARG_B,_CPPTHINGS_FE_ARG_A,_CPPTHINGS_FE_ARG_9,_CPPTHINGS_ARG_FE_8, \
+            _CPPTHINGS_FE_ARG_7,_CPPTHINGS_FE_ARG_6,_CPPTHINGS_FE_ARG_5,_CPPTHINGS_ARG_FE_4, \
+            _CPPTHINGS_FE_ARG_3,_CPPTHINGS_FE_ARG_2,_CPPTHINGS_FE_ARG_1,_CPPTHINGS_ARG_FE_0)(action,ARG __VA_OPT__(,) __VA_ARGS__)
+#else
 #define CPPTHINGS_FOR_EACH_ARG(action, ARG, ...) \
   _CPPTHINGS_GET_MACRO(_0, __VA_ARGS__, \
             _CPPTHINGS_FE_ARG_F,_CPPTHINGS_FE_ARG_E,_CPPTHINGS_FE_ARG_D,_CPPTHINGS_ARG_FE_C, \
             _CPPTHINGS_FE_ARG_B,_CPPTHINGS_FE_ARG_A,_CPPTHINGS_FE_ARG_9,_CPPTHINGS_ARG_FE_8, \
             _CPPTHINGS_FE_ARG_7,_CPPTHINGS_FE_ARG_6,_CPPTHINGS_FE_ARG_5,_CPPTHINGS_ARG_FE_4, \
             _CPPTHINGS_FE_ARG_3,_CPPTHINGS_FE_ARG_2,_CPPTHINGS_FE_ARG_1,_CPPTHINGS_ARG_FE_0)(action,ARG,__VA_ARGS__)
+#endif
 
 // because you need like a million concats
 #define CPPTHINGS_CONCAT_(A, B) A ## B
