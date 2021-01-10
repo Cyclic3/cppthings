@@ -14,6 +14,15 @@ struct int_data {
   inline CPPTHINGS_EZ_CONSTRUCTOR(int_data, value);
 };
 
+struct int_data2 {
+  int value1;
+  int value2;
+
+  CPPTHINGS_IMPL_SHALLOW_EQ_NOEXCEPT(int_data2, value1, value2);
+
+  inline CPPTHINGS_EZ_CONSTRUCTOR(int_data2, value1, value2);
+};
+
 #define __CPPTHINGS_MEMBER_PTR_1(TYPE, X) &TYPE::X
 
 #define CPPTHINGS_TEST_MACRO(X) int X;
