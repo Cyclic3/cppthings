@@ -69,11 +69,13 @@ namespace cppthings {
     template<typename... Args>                                                                \
     inline NAME(Args&&... args) : VAL_NAME(std::forward<Args>(args)...) {}
 
-#define _CPPTHINGS_MAKE_PARAMS(X) decltype(X)&& CPPTHINGS_CONCAT(X, _)
+#define _CPPTHINGS_MAKE_PARAMS(X) decltype(X) CPPTHINGS_CONCAT(X, _)
 #define _CPPTHINGS_MAKE_CONSTRUCTOR(X) X{std::move(CPPTHINGS_CONCAT(X, _))}
 
 #ifdef CPPTHINGS_VA_OPT
 #define CPPTHINGS_EZ_CONSTRUCTOR(NAME, ...) \
   NAME(CPPTHINGS_FOR_EACH_COMMA(_CPPTHINGS_MAKE_PARAMS __VA_OPT__(,) __VA_ARGS__))  __VA_OPT__(:) CPPTHINGS_FOR_EACH_COMMA(_CPPTHINGS_MAKE_CONSTRUCTOR __VA_OPT__(,) __VA_ARGS__) {}
 #else
-#define CPPT
+#define CPPTHINGS_EZ_CONSTRUCTOR(NAME, ...) \
+  NAME(CPPTHINGS_FOR_EACH_COMMA(_CPPTHINGS_MAKE_PARAMS, __VA_ARGS__)) : CPPTHINGS_FOR_EACH_COMMA(_CPPTHINGS_MAKE_CONSTRUCTOR, __VA_ARGS__) {}
+#endif
