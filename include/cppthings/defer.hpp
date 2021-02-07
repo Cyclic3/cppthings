@@ -6,21 +6,20 @@
 #include <functional>
 
 namespace cppthings {
-  template<typename F>
   class deferred_call {
   private:
-    F* f;
+    std::function<void()> f;
 
   public:
-    void cancel() { f = nullptr; }
+    void cancel() { f = {}; }
 
   public:
-    inline deferred_call() : f{nullptr} {}
-    inline deferred_call(F* f_) : f{std::move(f_)} {}
+    inline deferred_call() : f{} {}
+    inline deferred_call(std::function<void()>&& f_) : f{std::move(f_)} {}
 
     inline ~deferred_call() {
       if (f)
-        (*f)();
+        f();
     }
 
   public:
@@ -29,11 +28,11 @@ namespace cppthings {
 
     inline deferred_call& operator=(deferred_call&& other) {
       f = other.f;
-      other.f = nullptr;
+      other.f = {};
       return *this;
     }
-    inline deferred_call(deferred_call&& other) : f{other.f} {
-      other.f = nullptr;
+    inline deferred_call(deferred_call&& other) : f{std::move(other.f)} {
+      other.f = {};
     }
   };
 
@@ -71,11 +70,7 @@ namespace cppthings {
 
   /// Returns an object, which when destroyed, calls a function
   template<typename Func>
-  inline deferred_call<std::decay_t<Func>> defer(Func&& f) {
-    return {&f};
-  }
-  template<typename Func>
-  inline auto defer(Func* f) {
-    return deferred_call{f};
+  inline deferred_call defer(Func&& f) {
+    return {std::move(f)};
   }
 }
