@@ -14,36 +14,44 @@ namespace cppthings {
   }
 
   template<typename T, typename FirstType, typename... Args>
-  constexpr bool check_shallow_equal(const T& a, const T& b, FirstType T::* first, Args*... args) {
+  constexpr bool check_shallow_equal(const T& a, const T& b, FirstType T::* first, Args... args) {
     return a.*first == b.*first && check_shallow_equal(a, b, args...);
   }
 }
 
-#define __CPPTHINGS_MEMBER_PTR(TYPE, X) &TYPE::X
+#define _CPPTHINGS_MEMBER_PTR(TYPE, X) ,&TYPE::X
 
-#if defined(__cplusplus) && __cplusplus > 201703L
-#define CPPTHINGS_IMPL_SHALLOW_EQ(TYPE, ...) \
-  inline bool operator==(const TYPE& other) const { return ::cppthings::check_shallow_equal(*this, other __VA_OPT__(,) __VA_ARGS__);  } \
-  inline bool operator!=(const TYPE& other) const { return !::cppthings::check_shallow_equal(*this, other __VA_OPT__(,) __VA_ARGS__);  }
-
-#define CPPTHINGS_IMPL_SHALLOW_EQ_NOEXCEPT(TYPE, ...) \
-  inline bool operator==(const TYPE& other) const noexcept { return ::cppthings::check_shallow_equal(*this, other __VA_OPT__(,) __VA_ARGS__);  } \
-  inline bool operator!=(const TYPE& other) const noexcept { return !::cppthings::check_shallow_equal(*this, other __VA_OPT__(,) __VA_ARGS__);  }
-#else
+#ifdef CPPTHINGS_VA_OPT
 #define CPPTHINGS_IMPL_SHALLOW_EQ(TYPE, ...) \
   inline bool operator==(const TYPE& other) const { \
-    return ::cppthings::check_shallow_equal(*this, other, CPPTHINGS_FOR_EACH_ARG(__CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__));  \
+    return ::cppthings::check_shallow_equal(*this, other CPPTHINGS_FOR_EACH_ARG(_CPPTHINGS_MEMBER_PTR, TYPE __VA_OPT__(,) __VA_ARGS__));  \
   } \
   inline bool operator!=(const TYPE& other) const { \
-    return !::cppthings::check_shallow_equal(*this, other, CPPTHINGS_FOR_EACH_ARG(__CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__)); \
+    return !::cppthings::check_shallow_equal(*this, other CPPTHINGS_FOR_EACH_ARG(_CPPTHINGS_MEMBER_PTR, TYPE __VA_OPT__(,) __VA_ARGS__));  \
   }
 
 #define CPPTHINGS_IMPL_SHALLOW_EQ_NOEXCEPT(TYPE, ...) \
   inline bool operator==(const TYPE& other) const noexcept { \
-    return ::cppthings::check_shallow_equal(*this, other, CPPTHINGS_FOR_EACH_ARG(__CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__)); \
+    return ::cppthings::check_shallow_equal(*this, other CPPTHINGS_FOR_EACH_ARG(_CPPTHINGS_MEMBER_PTR, TYPE __VA_OPT__(,) __VA_ARGS__));  \
   } \
   inline bool operator!=(const TYPE& other) const noexcept { \
-    return !::cppthings::check_shallow_equal(*this, other, CPPTHINGS_FOR_EACH_ARG(__CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__)); \
+    return !::cppthings::check_shallow_equal(*this, other CPPTHINGS_FOR_EACH_ARG(_CPPTHINGS_MEMBER_PTR, TYPE __VA_OPT__(,) __VA_ARGS__));  \
+  }
+#else
+#define CPPTHINGS_IMPL_SHALLOW_EQ(TYPE, ...) \
+  inline bool operator==(const TYPE& other) const { \
+    return ::cppthings::check_shallow_equal(*this, other CPPTHINGS_FOR_EACH_ARG(_CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__));  \
+  } \
+  inline bool operator!=(const TYPE& other) const { \
+    return !::cppthings::check_shallow_equal(*this, other CPPTHINGS_FOR_EACH_ARG(_CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__));  \
+  }
+
+#define CPPTHINGS_IMPL_SHALLOW_EQ_NOEXCEPT(TYPE, ...) \
+  inline bool operator==(const TYPE& other) const noexcept { \
+    return ::cppthings::check_shallow_equal(*this, other CPPTHINGS_FOR_EACH_ARG(_CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__));  \
+  } \
+  inline bool operator!=(const TYPE& other) const noexcept { \
+    return !::cppthings::check_shallow_equal(*this, other CPPTHINGS_FOR_EACH_ARG(_CPPTHINGS_MEMBER_PTR, TYPE, __VA_ARGS__));  \
   }
 #endif
 
@@ -61,4 +69,13 @@ namespace cppthings {
     template<typename... Args>                                                                \
     inline NAME(Args&&... args) : VAL_NAME(std::forward<Args>(args)...) {}
 
-CPPTHINGS_BEGIN_WRAPPER_STRUCT(wrapper, int, value) };
+#define _CPPTHINGS_MAKE_PARAMS(X) decltype(X) CPPTHINGS_CONCAT(X, _)
+#define _CPPTHINGS_MAKE_CONSTRUCTOR(X) X{std::move(CPPTHINGS_CONCAT(X, _))}
+
+#ifdef CPPTHINGS_VA_OPT
+#define CPPTHINGS_EZ_CONSTRUCTOR(NAME, ...) \
+  NAME(CPPTHINGS_FOR_EACH_COMMA(_CPPTHINGS_MAKE_PARAMS __VA_OPT__(,) __VA_ARGS__))  __VA_OPT__(:) CPPTHINGS_FOR_EACH_COMMA(_CPPTHINGS_MAKE_CONSTRUCTOR __VA_OPT__(,) __VA_ARGS__) {}
+#else
+#define CPPTHINGS_EZ_CONSTRUCTOR(NAME, ...) \
+  NAME(CPPTHINGS_FOR_EACH_COMMA(_CPPTHINGS_MAKE_PARAMS, __VA_ARGS__)) : CPPTHINGS_FOR_EACH_COMMA(_CPPTHINGS_MAKE_CONSTRUCTOR, __VA_ARGS__) {}
+#endif
