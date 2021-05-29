@@ -8,6 +8,13 @@
 #define CPPTHINGS_VA_OPT
 #endif
 
+// because you need like a million concats
+#define CPPTHINGS_CONCAT_(A, B) A ## B
+#define CPPTHINGS_CONCAT(A, B) CPPTHINGS_CONCAT_(A, B)
+// because you need like a million stringifies
+#define CPPTHINGS_STRINGIFY_(A) #A
+#define CPPTHINGS_STRINGIFY(A) CPPTHINGS_STRINGIFY_(A)
+
 // SO requires a copyright notice (and the user deserves one), so make sure to copy something to that effect into
 // any cloned source file
 
@@ -140,10 +147,6 @@
             _CPPTHINGS_FE_ARG_C_7,_CPPTHINGS_FE_ARG_C_6,_CPPTHINGS_FE_ARG_C_5,_CPPTHINGS_FE_ARG_C_4, \
             _CPPTHINGS_FE_ARG_C_3,_CPPTHINGS_FE_ARG_C_2,_CPPTHINGS_FE_ARG_C_1,_CPPTHINGS_FE_ARG_C_0)(action, ARG, __VA_ARGS__)
 #endif
-
-// because you need like a million concats
-#define CPPTHINGS_CONCAT_(A, B) A ## B
-#define CPPTHINGS_CONCAT(A, B) CPPTHINGS_CONCAT_(A, B)
 
 #define _CPPTHINGS_DL_0
 #define _CPPTHINGS_DL_1(_0, ...) _0
